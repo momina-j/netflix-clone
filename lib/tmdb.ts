@@ -116,6 +116,19 @@ export const fetchSimilarMovies = async (movieId: string | number, mediaType: 'm
   }
 };
 
+export const fetchMovieImages = async (movieId: string | number, mediaType: 'movie' | 'tv' = 'movie'): Promise<any> => {
+  try {
+    const { data } = await tmdbApi.get(`/${mediaType}/${movieId}/images`, {
+      params: {
+        include_image_language: 'en,null',
+      }
+    });
+    return data;
+  } catch {
+    return null;
+  }
+};
+
 export const searchMovies = async (query: string, page: number = 1): Promise<SearchResult> => {
   try {
     const { data } = await tmdbApi.get('/search/multi', {

@@ -23,19 +23,28 @@ export default async function HomePage() {
     ]);
 
   return (
-    <main className="min-h-screen bg-zinc-950">
+    <main className="min-h-screen bg-[#141414]">
       <Navbar />
-      <Banner movies={trending.slice(0, 5)} />
-      <div className="relative z-10 -mt-20 pb-8">
-        <MovieRow title="🔥 Trending Now" movies={trending} />
-        <MovieRow title="🎬 Now Playing" movies={nowPlaying} />
-        <MovieRow title="⭐ Top Rated Movies" movies={topRatedMovies} />
-        <MovieRow title="🎭 Popular Movies" movies={popularMovies} />
-        <MovieRow title="🚀 Upcoming Movies" movies={upcoming} />
-        <MovieRow title="📺 Popular TV Shows" movies={popularTV} />
-        <MovieRow title="📡 Airing Today" movies={airingToday} />
-        <MovieRow title="🏆 Top Rated TV Shows" movies={topRatedTV} />
+      <Banner movies={trending.slice(0, 10)} />
+      
+      {/* 
+        The negative margin pulls the rows up over the banner gradient.
+        We use z-10 to ensure it sits above the video background.
+      */}
+      <div className="relative z-10 -mt-16 md:-mt-20 pb-8 overflow-visible">
+        <MovieRow title="Trending Now" movies={trending} />
+        
+        {/* Top 10 Row using topRatedMovies */}
+        <MovieRow title="Top 10 Movies Today" movies={topRatedMovies.slice(0, 10)} isTop10={true} />
+        
+        <MovieRow title="Continue Watching for User" movies={nowPlaying} />
+        <MovieRow title="New Releases" movies={upcoming} />
+        <MovieRow title="Popular on Netflix" movies={popularMovies} />
+        <MovieRow title="Binge-Worthy TV Shows" movies={popularTV} />
+        <MovieRow title="Airing Today" movies={airingToday} />
+        <MovieRow title="Critically Acclaimed TV" movies={topRatedTV} />
       </div>
+      
       <Footer />
     </main>
   );

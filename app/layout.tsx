@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Stream your favorite movies and TV shows with Netflix Clone. Built with Next.js and TMDB.',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children, modal }: { children: React.ReactNode; modal: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body style={{ fontFamily: "'Inter', system-ui, sans-serif" }} className="bg-zinc-950 text-white min-h-screen antialiased">
-        <Providers>{children}</Providers>
+        <Providers>{children}{modal}</Providers>
       </body>
     </html>
   );

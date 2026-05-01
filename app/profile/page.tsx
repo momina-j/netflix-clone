@@ -1,17 +1,16 @@
 'use client';
 
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { useMyList } from '@/store/useMyList';
-import { FaSignOutAlt, FaList, FaFilm } from 'react-icons/fa';
+import { FaLock } from 'react-icons/fa';
 
 export default function ProfilePage() {
-  const { data: session, status } = useSession();
+  const session = { user: { name: 'Demo User' } };
+  const status = 'authenticated';
   const router = useRouter();
-  const { myList } = useMyList();
+  const [loadingProfile, setLoadingProfile] = useState<number | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -19,88 +18,75 @@ export default function ProfilePage() {
     }
   }, [status, router]);
 
+  const selectProfile = (index: number) => {
+    setLoadingProfile(index);
+    setTimeout(() => {
+      router.push('/');
+    }, 800);
+  };
+
   if (status === 'loading') {
     return (
-      <main className="min-h-screen bg-zinc-950 pt-24">
-        <Navbar />
-        <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-        </div>
+      <main className="min-h-screen bg-[#141414] flex flex-col items-center justify-center">
+        <div className="w-12 h-12 border-4 border-[#E50914] border-t-transparent rounded-full animate-spin" />
       </main>
     );
   }
 
   if (!session) return null;
 
+  // Mock profiles
+  const profiles = [
+    { name: session.user?.name || 'User', color: 'bg-blue-600', isKids: false },
+    { name: 'Spouse', color: 'bg-red-600', isKids: false },
+    { name: 'Guest', color: 'bg-green-600', isKids: false },
+    { name: 'Kids', color: 'bg-yellow-500', isKids: true },
+  ];
+
   return (
-    <main className="min-h-screen bg-zinc-950 pt-24">
-      <Navbar />
+    <main className="min-h-screen bg-[#141414] flex flex-col">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 animate-fade-in">
+        <h1 className="text-3xl md:text-5xl text-white font-medium mb-8 tracking-wide">
+          Who&apos;s watching?
+        </h1>
 
-      <div className="max-w-2xl mx-auto px-4 pb-16">
-        <h1 className="text-3xl font-bold text-white mb-8">Account</h1>
-
-        {/* Profile Card */}
-        <div className="bg-zinc-900 rounded-xl p-6 mb-6 border border-zinc-800">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center text-2xl font-black text-white">
-              {session.user?.name?.[0]?.toUpperCase() || 'U'}
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-white">{session.user?.name}</h2>
-              <p className="text-gray-400">{session.user?.email}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-zinc-800 rounded-lg p-4">
-              <div className="flex items-center gap-2 text-gray-400 mb-1">
-                <FaList size={14} />
-                <span className="text-sm">My List</span>
+        <div className="flex flex-wrap justify-center gap-4 md:gap-8 max-w-4xl">
+          {profiles.map((profile, index) => (
+            <div
+              key={index}
+              onClick={() => selectProfile(index)}
+              className="flex flex-col items-center group cursor-pointer w-24 md:w-36"
+            >
+              <div className={`relative w-24 h-24 md:w-36 md:h-36 rounded-md mb-4 overflow-hidden transition-all duration-300 ${
+                loadingProfile === index ? 'scale-90 opacity-50' : 'group-hover:border-[3px] group-hover:border-white group-hover:shadow-[0_0_15px_rgba(255,255,255,0.3)]'
+              }`}>
+                {/* Profile Avatar Box */}
+                <div className={`w-full h-full ${profile.color} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
+                  <span className="text-4xl md:text-6xl text-white font-black opacity-90 drop-shadow-md">
+                    {profile.name[0]?.toUpperCase()}
+                  </span>
+                </div>
+                
+                {/* Spinner Overlay */}
+                {loadingProfile === index && (
+                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                    <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
               </div>
-              <p className="text-white text-2xl font-bold">{myList.length}</p>
-              <p className="text-gray-500 text-xs">titles saved</p>
-            </div>
-            <div className="bg-zinc-800 rounded-lg p-4">
-              <div className="flex items-center gap-2 text-gray-400 mb-1">
-                <FaFilm size={14} />
-                <span className="text-sm">Plan</span>
+
+              <div className="flex items-center gap-1.5 text-gray-400 group-hover:text-white transition-colors duration-300 text-sm md:text-lg">
+                <span>{profile.name}</span>
+                {profile.isKids && <FaLock size={12} className="opacity-70 mt-0.5" />}
               </div>
-              <p className="text-white text-lg font-bold">Standard</p>
-              <p className="text-gray-500 text-xs">with Ads</p>
             </div>
-          </div>
+          ))}
         </div>
 
-        {/* Membership */}
-        <div className="bg-zinc-900 rounded-xl p-6 mb-6 border border-zinc-800">
-          <h3 className="text-white font-bold mb-4">Membership & Billing</h3>
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-400">Email</span>
-              <span className="text-white">{session.user?.email}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">Password</span>
-              <span className="text-white">••••••••</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400">Phone</span>
-              <span className="text-gray-500">Not set</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Sign Out */}
-        <button
-          onClick={() => signOut({ callbackUrl: '/auth' })}
-          className="w-full flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white py-3 rounded-lg font-semibold transition-colors border border-zinc-700"
-        >
-          <FaSignOutAlt size={16} />
-          Sign out of Netflix Clone
+        <button className="mt-16 border border-gray-500 text-gray-500 px-6 py-2 uppercase tracking-widest text-[1vw] md:text-[14px] hover:text-white hover:border-white transition-colors">
+          Manage Profiles
         </button>
       </div>
-
-      <Footer />
     </main>
   );
 }
